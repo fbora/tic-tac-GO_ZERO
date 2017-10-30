@@ -20,3 +20,24 @@ This is the high level overview of the algorithm:
 
 With the caveat: since the board has rotational, inversion and color symmetry perform these operations before feeding the games to the NN.  Additionally, because you don't want your network trained on some games that were pretty much random (at the beginning), the training set for NN is trimmed to the most recent games (that can still be in the hundreds of thousands).
 
+### MCTS
+
+For each move in MCTS the evaluation has 1600 paths as follows:
+* for the first 30 moves the paths draw from U[N_a/N] with the temperature set to 1.
+* for moves after 30, you shock the prior probability distribution given by the NN
+P(s,a) = P(s,a) + Dirichlet(0.03) and chose the node that maximizes the action: Q(t) + c * P(s,a) \sqrt(N)/(1+N_a)
+For the procedure there are no roll-outs (i.e. random play outs from the expanded node).  If a new node is encountered the statistics are initialized to N=0, W=0, Q=0 and the process continues recursively until the game ends.  It's useful to note that in the limits
+    * lim_{N->0} a_t ~ P(s,a)
+    * lim_{N->\infty} = Q(t)
+All paths in the MC sample will update the node statistics.  While 1600 paths for a single symulation seems a small number, after many games have been played, we are going to have a good statistics and the sampling will follow the distribution of Q(t)
+After MCTS, a move is played according to U[N_a/N], but in this case it's only N=1600 paths that count for the choice.  After training had begun, the statistics a_t is practically proportional to the mean value of the action Q(t), but it's better to use the total number of visits to the edge N_a rather than Q, because for small N Q is more susceptible to outliers.
+    
+For our game we are going to use a different procedure for MCTS.  The entire point of the algorithm is to have a guided MCTS; in the case of tic-tac-toe the set of possible moves is relatively small; 1600 paths per move will generate good statistics in a single game.  We need to allow for a recursive process that balances 
+* NN learning to predict good moves which suggests good paths for MCTS
+* MCTS explores winning paths in the state space which is are used by the NN to predict better winning paths
+
+We will try to restrict the expansion of the statistics as much as we can, MCTS and next move play evaluation will consist of a single choice; statistics are aggregated from all moves.
+
+
+
+
