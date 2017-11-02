@@ -10,7 +10,7 @@ def train():
     neural_network.nn_predictor.reset_nn_check_pts()
     nn_training_set = None
 
-    iterations = 40
+    iterations = 50
 
     for _ in range(iterations):
         player1 = player.Zero_Player('x', 'Bot_ONE', nn_type='best', temperature=1)
@@ -36,7 +36,14 @@ def train():
 
 def zero_vs_random():
     N_games = 100
-    global_step = 40000
+    player1 = player.Random_Player('o', 'Bot_RANDOM1')
+    player2 = player.Random_Player('o', 'Bot_RANDOM2')
+    r_vs_r_game = game.Game(player1, player2)
+    w1, w2 = r_vs_r_game.play_symmetric(N_games)
+    print('{} vs {} summary:'.format(player1.name, player2.name))
+    print('wins={}, draws={}, losses={}'.format(w1, N_games - w1 - w2, w2))
+
+    global_step = 50000
     nn_check_pt = neural_network.nn_predictor.CHECK_POINTS_NAME + '-' + str(global_step)
     player1 = player.Zero_Player('x', 'Bot_ZERO', nn_type=nn_check_pt, temperature=0)
     player2 = player.Random_Player('o', 'Bot_RANDOM')
@@ -44,6 +51,13 @@ def zero_vs_random():
     w1, w2 = z_vs_r_game.play_symmetric(N_games)
     print('{} vs {} summary:'.format(player1.name, player2.name))
     print('wins={}, draws={}, losses={}'.format(w1, N_games-w1-w2, w2))
+
+    player1 = player.Zero_Player('x', 'Bot_ZERO1', nn_type=nn_check_pt, temperature=0)
+    player2 = player.Zero_Player('x', 'Bot_ZERO2', nn_type=nn_check_pt, temperature=0)
+    z_vs_z_game = game.Game(player1, player2)
+    w1, w2 = z_vs_z_game.play_symmetric(N_games)
+    print('{} vs {} summary:'.format(player1.name, player2.name))
+    print('wins={}, draws={}, losses={}'.format(w1, N_games - w1 - w2, w2))
 
 
 def main():
