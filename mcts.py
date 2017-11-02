@@ -8,7 +8,7 @@ import pickle
 class MCTS():
 
     MCTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'mcts')
-    PUCT_CONSTANT = 2.0
+    PUCT_CONSTANT = 10.0
     TREE_FILE = 'tree.pkl'
     EDGES_FILE = 'edges.pkl'
     TREE_PATH = os.path.join(MCTS_DIR, TREE_FILE)
