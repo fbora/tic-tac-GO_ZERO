@@ -45,13 +45,12 @@ That's the layout of the training.py file:
 
         if wins_player1 >= wins_player2:
             neural_network.nn_predictor.BEST = neural_network.nn_predictor.LAST
-    print('end training', dt.datetime.now())
 '''
 
 ### MCTS
 
 For each move in MCTS the evaluation has 1600 paths as follows:
-* for the first 30 moves the paths draw from [equation](http:/http://mathurl.com/yb83ggyg) with the temperature set to 1.
+* for the first 30 moves the paths draw from U[N_a/N] with the temperature set to 1.
 * for moves after 30, you shock the prior probability distribution given by the NN
 P(s,a) = P(s,a) + Dirichlet(0.03) and chose the node that maximizes the action: Q(t) + c * P(s,a) \sqrt(N)/(1+N_a)
 For the procedure there are no roll-outs (i.e. random play outs from the expanded node).  If a new node is encountered the statistics are initialized to N=0, W=0, Q=0 and the process continues recursively until the game ends.  It's useful to note that in the limits
@@ -59,12 +58,29 @@ For the procedure there are no roll-outs (i.e. random play outs from the expande
     * lim_{N->\infty} = Q(t)
 All paths in the MC sample will update the node statistics.  While 1600 paths for a single symulation seems a small number, after many games have been played, we are going to have a good statistics and the sampling will follow the distribution of Q(t)
 After MCTS, a move is played according to U[N_a/N], but in this case it's only N=1600 paths that count for the choice.  After training had begun, the statistics a_t is practically proportional to the mean value of the action Q(t), but it's better to use the total number of visits to the edge N_a rather than Q, because for small N Q is more susceptible to outliers.
-    
-For our game we are going to use a different procedure for MCTS.  The entire point of the algorithm is to have a guided MCTS; in the case of tic-tac-toe the set of possible moves is relatively small; 1600 paths per move will generate good statistics in a single game.  We need to allow for a recursive process that balances 
-* NN learning to predict good moves which suggests good paths for MCTS
-* MCTS explores winning paths in the state space which is are used by the NN to predict better winning paths
-
-We will try to restrict the expansion of the statistics as much as we can, MCTS and next move play evaluation will consist of a single choice; statistics are aggregated from all moves.
+  
+My version of MCTS uses the same version of PUCT function but there is no evaluation or random play for the next move.  For all possible moves (s, a) from a given state s, the next move is a single draw from the set of normalized PUCT values.  Before normalization the values are mapped to positive numbers by adding a constant because in tick tack toe the second player has a negative mean action value $Q(t)$ for most moves.  In the end it doesn't matter what particular choices you make for the exploration function, as long as the measured mean action converges to the true mean action after a long number of steps.
+ 
+The paths statistics are stored in a dictionary with a string key given by 'initialstate2finalstate' string.  After serious considerations I decided to not make the statistics color invariant because from the following board state:
+ 
+    xx_
+    ___  
+    oo_
+ 
+there is ambiguity on which is the best move for x or o depending what player moves.  The statistics assume that the first player always start with 'x', and for the moves of the second player we accumulate the statistics from their perspective; i.e. a win of the 'o' player improves their average action.
+ 
+### Neural network
+ 
+Go is a more complex game than tick-tac-toe, and the neural network they use is consequently more elaborate.  In our case I use a simple neural network with two layers and RELU activation.  The loss function in alpha go is a sum of MSE for game winner and logits for the move with an L2 penalty.  We use only MSE penalty for the 12 dimensional output of catenated one-hot-encoding winner and next move.
+ 
+ 
+### Evaluation
+During self play, when the purpose is to accumulate self play games the order is not important, but for the evaluation of the better neural network the order of play is important.  The second player in tic-tac-toe has the disadvantage of playing one less move than the first player.  We introduce a symmetric play where each player takes turns starting the game.  The same symmetric play is used after training to compare the Zero player to the Random player.  For two random players the win rate is 46% with the rest of the games ending in draw.  The trained Zero player has a win rate of 95% and a draw rate of 5%.  Occasionally, depending on parameters, and state of the network at the beginning of training we may have cases where the space of possible move is not fully explored resulting in a defeat rate of 0.1% for the current parameters.  I believe this can be fixed by tuning the network and PUCT constant.
+ 
+**Note that I did not spent time to improve the efficiency, all code is single threaded, and it takes about 2 hours to run training.py script.**
+ 
+ 
+After training run interactive.py script to play against the machine :)
 
 
 
