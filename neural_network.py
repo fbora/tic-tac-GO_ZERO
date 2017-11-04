@@ -86,15 +86,15 @@ class model_two_hidden():
 
             weight1 = tf.Variable(tf.random_uniform([size_x, size_hidden_1]), name='weight1')
             bias1 = tf.Variable(tf.zeros(size_hidden_1), name='bias1')
-            activation1 = tf.nn.sigmoid(tf.nn.xw_plus_b(self.X, weight1, bias1), name='activation1')
+            activation1 = tf.nn.relu(tf.nn.xw_plus_b(self.X, weight1, bias1), name='activation1')
 
             weight2 = tf.Variable(tf.random_uniform([size_hidden_1, size_hidden_2]), name='weight2')
             bias2 = tf.Variable(tf.zeros(size_hidden_2), name='bias2')
-            activation2 = tf.nn.sigmoid(tf.nn.xw_plus_b(activation1, weight2, bias2), name='activation2')
+            activation2 = tf.nn.relu(tf.nn.xw_plus_b(activation1, weight2, bias2), name='activation2')
 
             weight3 = tf.Variable(tf.random_uniform([size_hidden_2, size_y]), name='weight3')
             bias3 = tf.Variable(tf.zeros(size_y), name='bias3')
-            activation3 = tf.nn.sigmoid(tf.nn.xw_plus_b(activation2, weight3, bias3), name='activation3')
+            activation3 = tf.nn.relu(tf.nn.xw_plus_b(activation2, weight3, bias3), name='activation3')
 
             self.loss = tf.reduce_mean(tf.squared_difference(activation3, self.y), name='loss')
 
