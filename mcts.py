@@ -24,9 +24,11 @@ class MCTS():
         if not os.path.isdir(cls.MCTS_DIR):
             os.mkdir(cls.MCTS_DIR)
         if reset:
-            for file in os.listdir(cls.MCTS_DIR):
-                os.remove(os.path.join(cls.MCTS_DIR, file))
-        if not os.listdir(cls.MCTS_DIR):
+            if os.path.isfile(cls.TREE_PATH):
+                os.remove(cls.TREE_PATH)
+            if os.path.isfile(cls.EDGES_PATH):
+                os.remove(cls.EDGES_PATH)
+        if not (os.path.isfile(cls.TREE_PATH) or os.path.isfile(cls.EDGES_PATH)):
             tree, edges = board.Board.generate_state_space()
             cls.save_tree_edges(tree, edges)
         else:
