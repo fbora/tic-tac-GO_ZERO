@@ -17,7 +17,31 @@ class Random_Player():
         choice = np.random.choice(len(row))
         return self.type, row[choice], col[choice]
 
+    
+class Interactive_Player():
+    def __init__(self, type, name):
+        self.type = type
+        self.name = name
+        
+    def turn(self, board):
+        board.display(clear=True)
+        while True:
+            human_answer = input('Enter move: row, column tuple (indexing starts at 0)')
+            move = [int(x) for x in human_answer if str.isdigit(x)]
+            row, col = move[0], move[1]
+            if len(move) != 2:
+                print ('Incorrect input, try again!')
+                continue
+            if len([x for x in move if x<0 or x>2])>0:
+                print('row and column index can have only values: 0, 1, 2')
+                continue
+            if board.board[row, col] != 0:
+                print('Incorrect move; cell must be empty!')
+                continue
+            break
+        return self.type, row, col
 
+    
 class Zero_Player():
 
     def __init__(self, type, name, nn_type, temperature=1):
