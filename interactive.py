@@ -19,7 +19,7 @@ def interactive_game():
         print('Game ended in draw!')
     else:
         winner = player1 if outcome[1] == player1.type else player2
-        print('{} won the game!'.format(winner.game))
+        print('{} won the game!'.format(winner.name))
 
 
 def main():
