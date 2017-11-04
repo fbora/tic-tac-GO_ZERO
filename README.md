@@ -75,14 +75,14 @@ Go is a more complex game than tick-tac-toe, and the neural network they use is 
  
  
 ### Evaluation
-During self play, when the purpose is to accumulate self play games the order is not important, but for the evaluation of the better neural network the order of play is important.  The second player in tic-tac-toe has the disadvantage of playing one less move than the first player.  We introduce a symmetric play where each player takes turns starting the game.  The same symmetric play is used after training to compare the Zero player to the Random player.  For two random players the win rate is 46% with the rest of the games ending in draw.  The trained Zero player has a win rate of 95% and a draw rate of 5%.  Occasionally, depending on parameters, and state of the network at the beginning of training we may have cases where the space of possible move is not fully explored resulting in a defeat rate of 0.1% for the current parameters.  I believe this can be fixed by tuning the network and PUCT constant.
+During self play, when the purpose is to accumulate self play games the order is not important, but for the evaluation of the better neural network the order of play is important.  The second player in tic-tac-toe has the disadvantage of playing one less move than the first player.  We introduce a symmetric play where each player takes turns starting the game.  The same symmetric play is used after training to compare the Zero player to the Random player.  For two random players the win rate is 46% with the rest of the games ending in draw.  The trained Zero player has a win rate of 95% and a draw rate of 5%.  Occasionally, depending on parameters, and state of the network at the beginning of training, we may have cases where the space of possible move is not fully explored resulting in a defeat rate of <0.1% for the current parameters.  I believe this can be fixed by tuning the network, PUCT constant and more training iterations.
  
 **Note that I did not spent time to improve the efficiency, all code is single threaded, and it takes about 2 hours to run training.py script.**
 
 Interesting fact: with the current script settings not all paths in the Monte Carlo are explored, with 1-2% not gathering any statistics.  If we play a large number of games (1 million) against the random player, all these paths are going to be explored, but the trained player still never loses.  When there are no statistics accumulated by MCTS the play is the recommendation made by the neural network, which means that the network learned how to play the game well by predicting what MCTS would play.
  
  
-After training run interactive.py script to play against the machine :)
+After training, run interactive.py script to play against the machine :)
 
 
 
