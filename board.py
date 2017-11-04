@@ -1,5 +1,6 @@
 __author__='Florin Bora'
 
+import os
 import numpy as np
 import functools
 
@@ -26,7 +27,9 @@ class Board():
     def full(self):
         return self.board.ravel().astype(bool).sum() == Board.SIZE.prod()
 
-    def display(self):
+    def display(self, clear=False):
+        if clear:
+            os.system('cls')
         print(
             '\n'
             '\t {0} | {1} | {2}\n'
