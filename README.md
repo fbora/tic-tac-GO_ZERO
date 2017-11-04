@@ -1,6 +1,9 @@
 # tic-tac-GO_ZERO
 _Implementation of Alpha Go Zero algorithm for the game of tic-tac-toe._
 
+$ training.py
+$ interactive.py
+
 Two weeks ago, Deep Mind team at Google published in [Nature](https://www.nature.com/articles/nature24270.epdf) the algorithm of [Alpha Go Zero](https://deepmind.com/blog/alphago-zero-learning-scratch), "an algorithm based solely on reinforcement learning, without human data, guidance or domain knowledge beyond game rules".  The results are nothig but spectacular: "Starting tabula rasa, our new program AlphaGo Zero achieved superhuman performance, winning 100–0 against the previously published, champion-defeating AlphaGo."
 
 My means are more modest (at least when it comes to computational power); the purpose of this project is to replicate the algorithm to play the game of tic-tac-toe to the same super-human performance (i.e. to never lose against a random player, against itself or against a human player).  Of course the condition of "never lose" is because the game of tic-tac-toe is solvable, and it will always end in a draw if the players play perfectly.  This code is the result of two weeks of paper reading and python hacking.
