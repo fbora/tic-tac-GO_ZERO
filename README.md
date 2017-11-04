@@ -20,10 +20,38 @@ This is the high level overview of the algorithm:
 
 With the caveat: since the board has rotational, inversion and color symmetry perform these operations before feeding the games to the NN.  Additionally, because you don't want your network trained on some games that were pretty much random (at the beginning), the training set for NN is trimmed to the most recent games (that can still be in the hundreds of thousands).
 
+That's the layout of the training.py file:
+
+'''
+
+    iterations = 50
+    for _ in range(iterations):
+        player1 = player.Zero_Player('x', 'Bot_ONE', nn_type='best', temperature=1)
+        player2 = player.Zero_Player('o', 'Bot_ONE', nn_type='best', temperature=1)
+        self_play_game = game.Game(player1, player2)
+        self_play_results = self_play_game.play(500)
+        augmented_self_play_results = neural_network.augment_data_set(self_play_results)
+
+        mcts.MCTS.update_mcts_edges(augmented_self_play_results)
+        nn_training_set = neural_network.update_nn_training_set(self_play_results, nn_training_set)
+
+        neural_network.train_nn(nn_training_set)
+
+        player1 = player.Zero_Player('x', 'Bot_ONE', nn_type='last', temperature=0)
+        player2 = player.Zero_Player('o', 'Bot_ONE', nn_type='best', temperature=0)
+
+        nn_test_game = game.Game(player1, player2)
+        wins_player1, wins_player2 = nn_test_game.play_symmetric(100)
+
+        if wins_player1 >= wins_player2:
+            neural_network.nn_predictor.BEST = neural_network.nn_predictor.LAST
+    print('end training', dt.datetime.now())
+'''
+
 ### MCTS
 
 For each move in MCTS the evaluation has 1600 paths as follows:
-* for the first 30 moves the paths draw from U[N_a/N] with the temperature set to 1.
+* for the first 30 moves the paths draw from [equation](http:/http://mathurl.com/yb83ggyg) with the temperature set to 1.
 * for moves after 30, you shock the prior probability distribution given by the NN
 P(s,a) = P(s,a) + Dirichlet(0.03) and chose the node that maximizes the action: Q(t) + c * P(s,a) \sqrt(N)/(1+N_a)
 For the procedure there are no roll-outs (i.e. random play outs from the expanded node).  If a new node is encountered the statistics are initialized to N=0, W=0, Q=0 and the process continues recursively until the game ends.  It's useful to note that in the limits
